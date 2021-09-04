@@ -18,7 +18,16 @@ attribution: 'Map data © <a href="https://www.openstreetmap.org/">OpenStreetMap
 // Create a base layer that holds both maps.
 let baseMaps = {
     Streets: streets,
-    'Satellite Streets': satelliteStreets 
+    Satellite: satelliteStreets 
+  };
+
+// Create the earthquake layer for our map.
+let earthquakes = new L.layerGroup();
+
+// We define an object that contains the overlays.
+// This overlay will be visible all the time.
+let overlays = {
+    Earthquakes: earthquakes
   };
 
 // Create the map object with a center and zoom level.
@@ -29,7 +38,7 @@ let map = L.map('mapid', {
 });
 
 // Pass our map layers into our layers control and add the layers control to the map.
-L.control.layers(baseMaps).addTo(map);
+L.control.layers(baseMaps, overlays).addTo(map);
 
 // Accessing the airport GeoJSON URL
 let earthquakeData  = "https://earthquake.usgs.gov/earthquakes/feed/v1.0/summary/all_week.geojson";
@@ -90,11 +99,12 @@ L.geoJson(data, {
         return L.circleMarker(latlng);
       },
     // We set the style for each circleMarker using our styleInfo function.
-  style: styleInfo,
+     style: styleInfo,
     // We create a popup for each circleMarker to display the magnitude and
     //  location of the earthquake after the marker has been created and styled.
     onEachFeature: function(feature, layer) {
     layer.bindPopup(`<h3>Magnitude: ${feature.properties.mag}</h3> <hr> <h4>Location: ${feature.properties.place}</h4>`);
   }
-}).addTo(map);
+}).addTo(earthquakes);
+earthquakes.addTo(map);
 });
